@@ -3,6 +3,23 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     concat: {
+      options: { separator: ';'},
+      dist: {
+        src: ['public/client/**/*.js'],
+        dest: 'public/dist/<%= pkg.name %>.min.js'
+      }
+    },
+
+    gitpush: {
+      your_target: {
+        options: {
+          //target options
+          branch: 'master',
+          remote: 'live2'
+          // remote: ssh://root@http://104.131.135.222/
+
+        }
+      }
     },
 
     mochaTest: {
@@ -14,22 +31,38 @@ module.exports = function(grunt) {
       }
     },
 
+    clean: {
+      build: ['public/dist']
+    },
+
     nodemon: {
       dev: {
-        script: 'server.js'
+        script: './server.js'
       }
     },
 
     uglify: {
+      my_target: {
+        files: {
+          'public/dist/<%= pkg.name %>.min.js' : ['public/client/**/*.js']
+        }
+      }
+
     },
 
     eslint: {
       target: [
         // Add list of files to lint here
+        'public/client/**/*.js',
       ]
     },
 
     cssmin: {
+      target: {
+        files: {
+          'public/dist/<%= pkg.name %>.min.css' : ['public/**/*.css']
+        }
+      }
     },
 
     watch: {
@@ -63,6 +96,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-nodemon');
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-git');
 
   grunt.registerTask('server-dev', function (target) {
     grunt.task.run([ 'nodemon', 'watch' ]);
@@ -76,7 +111,28 @@ module.exports = function(grunt) {
     'mochaTest'
   ]);
 
+  grunt.registerTask('start', [
+    'nodemon'
+  ]);
+
   grunt.registerTask('build', [
+    'test',
+    'eslint',
+    'concat',
+    'cssmin', 
+    'uglify'
+  ]); 
+
+  grunt.registerTask('push', [
+
+  ]);  
+
+  grunt.registerTask('default', [
+    'build'
+  ]);  
+
+  grunt.registerTask('watchFiles', [
+    'watch'
   ]);
 
   grunt.registerTask('upload', function(n) {
