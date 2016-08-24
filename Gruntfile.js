@@ -15,8 +15,8 @@ module.exports = function(grunt) {
         options: {
           //target options
           branch: 'master',
-          remote: 'live2'
-          // remote: ssh://root@http://104.131.135.222/
+          // remote: 'live2'
+          remote: 'ssh://root@104.131.135.222/root/bare'
 
         }
       }
@@ -111,9 +111,6 @@ module.exports = function(grunt) {
     'mochaTest'
   ]);
 
-  grunt.registerTask('start', [
-    'nodemon'
-  ]);
 
   grunt.registerTask('build', [
     'test',
@@ -123,17 +120,14 @@ module.exports = function(grunt) {
     'uglify'
   ]); 
 
-  grunt.registerTask('push', [
-
+  grunt.registerTask('pushToProd', [
+    'gitpush'
   ]);  
 
   grunt.registerTask('default', [
     'build'
   ]);  
 
-  grunt.registerTask('watchFiles', [
-    'watch'
-  ]);
 
   grunt.registerTask('upload', function(n) {
     if (grunt.option('prod')) {
@@ -143,9 +137,13 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.registerTask('deploy', [
-    // add your deploy tasks here
-  ]);
+  grunt.registerTask('deploy', function(n) {
 
-
+    if (grunt.option('prod')) {
+      grunt.task.run(['build', 'pushToProd']);
+    } else {
+      grunt.task.run(['build', 'server-dev']);
+    }
+    
+  }); 
 };
