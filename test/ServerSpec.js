@@ -48,6 +48,7 @@ describe('', function() {
             'url': 'http://www.roflzoo.com/'})
           .expect(200)
           .expect(function(res) {
+            console.log('response body in test: ', res.body);
             expect(res.body.url).to.equal('http://www.roflzoo.com/');
             expect(res.body.code).to.be.ok;
           })
@@ -97,7 +98,8 @@ describe('', function() {
           baseUrl: 'http://127.0.0.1:4568',
           visits: 0
         });
-
+        link.shorten();
+        console.log('link.code in test', link, link.code);
         link.save(function() {
           done();
         });
@@ -119,6 +121,7 @@ describe('', function() {
 
       it('Shortcode redirects to correct url', function(done) {
         var sha = link.code;
+        console.log('sha code', sha);
         request(app)
           .get('/' + sha)
           .expect(302)
@@ -208,10 +211,12 @@ describe('', function() {
   describe('Account Login:', function() {
 
     beforeEach(function(done) {
-      new User({
+      var user = new User({
         'username': 'Phillip',
         'password': 'Phillip'
-      }).save(function() {
+      });
+      user.hash();
+      user.save(function() {
         done();
       });
     });
